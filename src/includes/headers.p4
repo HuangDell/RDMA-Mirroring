@@ -10,7 +10,7 @@ typedef bit<48> timestamp_t;
 typedef bit<16> timestamp_head_t;
 typedef bit<32> timestamp_tail_t;
 
-typedef bit<1> flag_t;
+typedef bit<8> flag_t;
 
 struct port_metadata_t {
     bit<8> switch_id;
@@ -137,6 +137,12 @@ header ig_mirror1_h {
     bit<8> last_ack;
 }
 
+header timestamp_header_t{
+    flag_t first_pkg_flag;
+    timestamp_t timestamp_diff;
+    timestamp_t last_timestamp;
+}
+
 struct header_t {
 
     /* Normal headers */
@@ -161,9 +167,7 @@ struct metadata_t {
     /* mirroring */
     ig_mirror1_h ig_mirror1;
     MirrorId_t mirror_session;
-    flag_t first_pkg_flag;
-    alg_t timestamp_diff;
+    timestamp_header_t ts;
     
-    // timestamp_t timestamp_diff;
 
 }
