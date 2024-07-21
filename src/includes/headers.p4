@@ -130,17 +130,14 @@ header ib_aeth_h {
 /* Mirror Types */
 const bit<3> IG_MIRROR_TYPE_1 = 1; // corresponds to ig_mirror1_h
 
-header ig_mirror1_h {
-    bit<48> ingress_mac_timestamp;
-    bit<8> opcode;
-    bit<8> mirrored;
-    bit<8> last_ack;
-}
 
-header timestamp_header_t{
-    flag_t first_pkg_flag;
-    timestamp_t timestamp_diff;
+header timestamp_h{
+    timestamp_t mac_timestamp;
     timestamp_t last_timestamp;
+    timestamp_t timestamp_diff;
+
+    flag_t first_pkg_flag;
+    bit<8> mirrored;
 }
 
 struct header_t {
@@ -165,9 +162,8 @@ struct metadata_t {
     port_metadata_t port_md; 
 
     /* mirroring */
-    ig_mirror1_h ig_mirror1;
     MirrorId_t mirror_session;
-    timestamp_header_t ts;
+    timestamp_h ts;
     
 
 }

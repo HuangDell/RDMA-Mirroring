@@ -110,9 +110,8 @@ control SwitchIngress(
 			ig_intr_md_for_dprsr.mirror_type = IG_MIRROR_TYPE_1;
 			meta.mirror_session = MIRROR_SESSION_RDMA_ID_IG;
 			meta.ts.last_timestamp=last_timestamp_head++last_timestamp_tail;
-			meta.ig_mirror1.ingress_mac_timestamp = ig_intr_md.ingress_mac_tstamp;
-			meta.ig_mirror1.opcode = hdr.bth.opcode;
-			meta.ig_mirror1.mirrored = (bit<8>)IG_MIRROR_TYPE_1;
+			meta.ts.mac_timestamp = ig_intr_md.ingress_mac_tstamp;
+			meta.ts.mirrored = (bit<8>)IG_MIRROR_TYPE_1;
         }
 	}
 
@@ -130,19 +129,20 @@ control SwitchEgress(
 
 
 	apply{
-		if (meta.ig_mirror1.mirrored == (bit<8>)IG_MIRROR_TYPE_1) {  // if is a mirroring pkg , do this
+		if (meta.ts.mirrored == (bit<8>)IG_MIRROR_TYPE_1) {  // if is a mirroring pkg , do this
 
 			// cal diff timestamp
 			if(meta.ts.first_pkg_flag==8w0){
-				// alg_t ingress_mac_tstamp_temp=(bit<64>)meta.ig_mirror1.ingress_mac_timestamp;
-				// ingress_mac_tstamp_temp=(bit<64>)meta.ig_mirror1.ingress_mac_timestamp;
+				// alg_t mac_timestamp=(bit<64>)meta.ts.mac_timestamp;
+				// alg_t last_timestamp=(bit<64>)meta.ts.last_timestamp;
+				// meta.ts.timestamp_diff=(bit<48>)(mac_timestamp + last_timestamp);
 
-				meta.ts.timestamp_diff= meta.ig_mirror1.ingress_mac_timestamp - meta.ts.last_timestamp;
+				// meta.ts.timestamp_diff= meta.ts.last_timestamp ;
 			}
 			/* Timestamp -> MAC Src Address*/
-			hdr.ethernet.src_addr = meta.ig_mirror1.ingress_mac_timestamp; // 48 bits
+			hdr.ethernet.src_addr = meta.ts.mac_timestamp; // 48 bits
 			/* time diff -> MAC Dst Address */
-			hdr.ethernet.dst_addr = (bit<48>)meta.ts.timestamp_diff;
+			hdr.ethernet.dst_addr = meta.ts.timestamp_diff;
 		}
 	} 
 

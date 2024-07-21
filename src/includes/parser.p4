@@ -142,10 +142,11 @@ control SwitchIngressDeparser(
 
         if(ig_dprsr_md.mirror_type == IG_MIRROR_TYPE_1) {      
             // which session? what mirroring metadata?
-            mirror.emit<ig_mirror1_h>(meta.mirror_session, {meta.ig_mirror1.ingress_mac_timestamp, 
-                                                                    meta.ig_mirror1.opcode,
-                                                                    meta.ig_mirror1.mirrored,
-                                                                    meta.ig_mirror1.last_ack});
+            mirror.emit<timestamp_h>(meta.mirror_session, {meta.ts.mac_timestamp, 
+                                                                    meta.ts.last_timestamp,
+                                                                    meta.ts.timestamp_diff,
+                                                                    meta.ts.first_pkg_flag,
+                                                                    meta.ts.mirrored});
         }
         pkt.emit(hdr);
     }
@@ -170,7 +171,7 @@ parser SwitchEgressParser(
 
     // pkg which is ingress mirroring should be parsed mirroring metadata at this state
     state parse_metadata {
-        ig_mirror1_h mirror_md = pkt.lookahead<ig_mirror1_h>();
+        timestamp_h mirror_md = pkt.lookahead<timestamp_h>();
         transition select(mirror_md.mirrored) {
             (bit<8>)IG_MIRROR_TYPE_1 : parse_ig_mirror_md;  // if is mirroring pkg
             default : parse_ethernet;  // orginal pkg
@@ -179,7 +180,7 @@ parser SwitchEgressParser(
 
     /* mirroring */
     state parse_ig_mirror_md {
-        pkt.extract(meta.ig_mirror1);
+        pkt.extract(meta.ts);
         transition parse_ethernet;
     }
 
