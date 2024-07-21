@@ -1,12 +1,16 @@
 #pragma once
 
-/* for random number generation */
-#define RANDOM_GEN_BIT_WIDTH 20
-typedef bit<RANDOM_GEN_BIT_WIDTH> random_gen_bitwidth_t;
 
+typedef bit<64> alg_t;
 
 typedef bit<48> mac_addr_t;
 typedef bit<32> ipv4_addr_t;
+
+typedef bit<48> timestamp_t;
+typedef bit<16> timestamp_head_t;
+typedef bit<32> timestamp_tail_t;
+
+typedef bit<1> flag_t;
 
 struct port_metadata_t {
     bit<8> switch_id;
@@ -122,31 +126,18 @@ header ib_aeth_h {
     bit<8> msg_seq_number;
 }
 
-/* Any metadata to be bridged from ig to eg */
-header bridged_meta_h {
-}
 
 /* Mirror Types */
 const bit<3> IG_MIRROR_TYPE_1 = 1; // corresponds to ig_mirror1_h
-const bit<3> EG_MIRROR_TYPE_1 = 2;  // corresponds to eg_mirror1_h
-
-header eg_mirror1_h {
-    bit<48> egress_global_timestamp;
-    bit<8> mirrored;
-    @flexible bit<2> ecn;
-}
 
 header ig_mirror1_h {
     bit<48> ingress_mac_timestamp;
     bit<8> opcode;
     bit<8> mirrored;
     bit<8> last_ack;
-    bit<32> rdma_seqnum;
 }
 
 struct header_t {
-    /* custom bridged info, needs to be deparsed from ig to eg */
-    bridged_meta_h bridged_meta;  
 
     /* Normal headers */
     ethernet_h ethernet;
@@ -168,13 +159,11 @@ struct metadata_t {
     port_metadata_t port_md; 
 
     /* mirroring */
-    eg_mirror1_h eg_mirror1;
     ig_mirror1_h ig_mirror1;
     MirrorId_t mirror_session;
+    flag_t first_pkg_flag;
+    alg_t timestamp_diff;
     
-    /* ECN */
-    bit<1> exceeded_ecn_marking_threshold;
-    bit<8> cc_mode;
-    bit<8> dcqcn_random_number;
-    bit<8> dcqcn_prob_output;
+    // timestamp_t timestamp_diff;
+
 }

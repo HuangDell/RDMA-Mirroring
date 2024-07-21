@@ -7,7 +7,7 @@ BUILD_DIR="build"
 # 检查 build 文件夹是否存在
 if [ -d "$BUILD_DIR" ]; then
   echo "Directory $BUILD_DIR exists. Deleting..."
-  rm -rf "$BUILD_DIR"
+  sudo rm -rf "$BUILD_DIR"
 else
   echo "Directory $BUILD_DIR does not exist."
 fi

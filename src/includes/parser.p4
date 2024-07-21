@@ -140,14 +140,12 @@ control SwitchIngressDeparser(
             hdr.ipv4.src_addr,
             hdr.ipv4.dst_addr});
 
-        // different mirror types can define different sets of headers
         if(ig_dprsr_md.mirror_type == IG_MIRROR_TYPE_1) {      
             // which session? what mirroring metadata?
             mirror.emit<ig_mirror1_h>(meta.mirror_session, {meta.ig_mirror1.ingress_mac_timestamp, 
                                                                     meta.ig_mirror1.opcode,
                                                                     meta.ig_mirror1.mirrored,
-                                                                    meta.ig_mirror1.last_ack,
-                                                                    meta.ig_mirror1.rdma_seqnum});
+                                                                    meta.ig_mirror1.last_ack});
         }
         pkt.emit(hdr);
     }
@@ -265,7 +263,6 @@ control SwitchEgressDeparser(
     in egress_intrinsic_metadata_t eg_intr_md,
     in egress_intrinsic_metadata_from_parser_t eg_intr_md_from_prsr){
 
-    Mirror() mirror;
 
 	apply{
         
