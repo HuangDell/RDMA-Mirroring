@@ -137,7 +137,7 @@ control SwitchEgress(
 				// alg_t last_timestamp=(bit<64>)meta.ts.last_timestamp;
 				// meta.ts.timestamp_diff=(bit<48>)(mac_timestamp + last_timestamp);
 
-				// meta.ts.timestamp_diff= meta.ts.last_timestamp ;
+				meta.ts.timestamp_diff= meta.ts.last_timestamp ;
 			}
 			/* Timestamp -> MAC Src Address*/
 			hdr.ethernet.src_addr = meta.ts.mac_timestamp; // 48 bits
