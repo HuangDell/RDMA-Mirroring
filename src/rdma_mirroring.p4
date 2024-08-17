@@ -21,39 +21,38 @@ control SwitchIngress(
     inout ingress_intrinsic_metadata_for_tm_t ig_intr_md_for_tm){
 
 	// store the timestamp of the previous pkg
-	Register <timestamp_tail_t,_>(1,32w0) last_timestamp_tail_reg;  // default = 0
-	Register <timestamp_head_t,_>(1,16w0) last_timestamp_head_reg;  // default = 0
-
+	// Register <timestamp_tail_t,_>(1,32w0) last_timestamp_tail_reg;  // default = 0
+	// Register <timestamp_head_t,_>(1,16w0) last_timestamp_head_reg;  // default = 0
 	// Register <timestamp_t,_>(1,48w0) last_timestamp_reg;  // default = 0
 
-	RegisterAction<timestamp_tail_t,_,timestamp_tail_t> (last_timestamp_tail_reg) 
-	read_and_set_timestemp_tail={
-		void apply(inout timestamp_tail_t data,out timestamp_tail_t last_timestamp_tail){
-			last_timestamp_tail=data;
-			data=ig_intr_md.ingress_mac_tstamp[31:0];
-		}
-	};
+	//RegisterAction<timestamp_tail_t,_,timestamp_tail_t> (last_timestamp_tail_reg) 
+	//read_and_set_timestemp_tail= {
+	// 	void apply(inout timestamp_tail_t data,out timestamp_tail_t last_timestamp_tail){
+	// 		last_timestamp_tail=data;
+	// 		data=ig_intr_md.ingress_mac_tstamp[31:0];
+	// 	}
+	// };
 
-	RegisterAction<timestamp_head_t,_,timestamp_head_t> (last_timestamp_head_reg) 
-	read_and_set_timestemp_head={
-		void apply(inout timestamp_head_t data,out timestamp_head_t last_timestamp_head){
-			last_timestamp_head=data;
-			data=ig_intr_md.ingress_mac_tstamp[47:32];
-		}
-	};
+	// RegisterAction<timestamp_head_t,_,timestamp_head_t> (last_timestamp_head_reg) 
+	// read_and_set_timestemp_head={
+	// 	void apply(inout timestamp_head_t data,out timestamp_head_t last_timestamp_head){
+	// 		last_timestamp_head=data;
+	// 		data=ig_intr_md.ingress_mac_tstamp[47:32];
+	// 	}
+	// };
 
 
 
 	// flag for the first reg
-	Register <flag_t,_>(1,1w1) first_pkg_flag_reg;  // default = 1
+	// Register <flag_t,_>(1,1w1) first_pkg_flag_reg;  // default = 1
 
-	RegisterAction<flag_t,_,flag_t>(first_pkg_flag_reg)
-	read_and_set_flag={
-		void apply(inout flag_t data,out flag_t flag){
-			flag=data;
-			data=1w0;
-		}
-	};
+	// RegisterAction<flag_t,_,flag_t>(first_pkg_flag_reg)
+	// read_and_set_flag={
+	// 	void apply(inout flag_t data,out flag_t flag){
+	// 		flag=data;
+	// 		data=1w0;
+	// 	}
+	// };
 
 	/**
 	 * @brief L2 Forwarding
@@ -97,34 +96,27 @@ control SwitchIngress(
 
         l2_forward.apply(); 
 
-        if (hdr.bth.isValid()){ // if RDMA
-			bit<1> index=0;  // flag reg and timestamp just have one item, so index is 0
-			meta.first_pkg_flag=read_and_set_flag.execute(index);
+        if (hdr.tcp.isValid()){ // if TCP
+			// bit<1> index=0;  // flag reg and timestamp just have one item, so index is 0
+			// meta.first_pkg_flag=read_and_set_flag.execute(index);
             // mirror_to_collector(MIRROR_SESSION_RDMA_ID_IG); // ig_mirror all RDMA packets
 
 
-			timestamp_t last_timestamp;
-			timestamp_head_t last_timestamp_head;
-			timestamp_tail_t last_timestamp_tail;
+			// timestamp_t last_timestamp;
+			// timestamp_head_t last_timestamp_head;
+			// timestamp_tail_t last_timestamp_tail;
 
-			last_timestamp_head=read_and_set_timestemp_head.execute(index);
-			last_timestamp_tail=read_and_set_timestemp_tail.execute(index);
-			last_timestamp=last_timestamp_head++last_timestamp_tail;
-
-
-
-
-
-
-
-			// cal diff timestamp
-			if(meta.first_pkg_flag==1w1){
-				meta.timestamp_diff=64w0;
-			}else{
-				alg_t ingress_mac_tstamp_temp=(bit<64>)ig_intr_md.ingress_mac_tstamp;
-				alg_t last_timestamp_temp=(bit<64>)last_timestamp;
-				meta.timestamp_diff= ingress_mac_tstamp_temp - last_timestamp_temp;
-			}
+			// last_timestamp_head=read_and_set_timestemp_head.execute(index);
+			// last_timestamp_tail=read_and_set_timestemp_tail.execute(index);
+			// last_timestamp=last_timestamp_head++last_timestamp_tail;
+			// // cal diff timestamp
+			// if(meta.first_pkg_flag==1w1){
+			// 	meta.timestamp_diff=64w0;
+			// }else{
+			// 	alg_t ingress_mac_tstamp_temp=(bit<64>)ig_intr_md.ingress_mac_tstamp;
+			// 	alg_t last_timestamp_temp=(bit<64>)last_timestamp;
+			// 	meta.timestamp_diff= ingress_mac_tstamp_temp - last_timestamp_temp;
+			// }
 
 			ig_intr_md_for_dprsr.mirror_type = IG_MIRROR_TYPE_1;
 			meta.mirror_session = MIRROR_SESSION_RDMA_ID_IG;
@@ -152,7 +144,7 @@ control SwitchEgress(
 			/* Timestamp -> MAC Src Address*/
 			hdr.ethernet.src_addr = meta.ig_mirror1.ingress_mac_timestamp; // 48 bits
 			/* time diff -> MAC Dst Address */
-			hdr.ethernet.dst_addr = (bit<48>)meta.timestamp_diff;
+			// hdr.ethernet.dst_addr = (bit<48>)meta.timestamp_diff;
 		}
 	} 
 
