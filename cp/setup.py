@@ -14,6 +14,7 @@ MIRROR_SESSION_RDMA_SNIFF_EG = 888 # mirroring's session id for sniffing RDMA pa
 devtest_cmds_file = "/home/user/Desktop/P4/conweave-p4/native_dcqcn/cp/devtest_cmds.py"
 
 hostname = socket.gethostname()
+hostname = 'P4-2'
 print("Hostname: {}".format(hostname))
 l2_forward = bfrt.rdma_mirroring.pipe.SwitchIngress.l2_forward
 
